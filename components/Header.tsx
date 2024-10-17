@@ -1,12 +1,18 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { SafeAreaView, View, Text, StyleSheet, StatusBar } from 'react-native';
 import Colors from '../constants/Colors';
 
 const Header = () => {
   return (
-    <View style={styles.header}>
-      <Text style={styles.title}>Farmacias cercanas</Text>
-    </View>
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar
+        barStyle="dark-content" // Ajusta a 'light-content' si prefieres un texto de la barra de estado claro.
+        backgroundColor="#FFFFFF" // El color de fondo de la barra de estado
+      />
+      <View style={styles.header}>
+        <Text style={styles.title}>Farmacias cercanas</Text>
+      </View>
+    </SafeAreaView>
   );
 };
 
@@ -14,15 +20,16 @@ const styles = StyleSheet.create({
   header: {
     width: '100%',
     height: 70,
-    backgroundColor: '#FFFFFF', // Cambia el color de fondo
     justifyContent: 'center',   // Centra el contenido verticalmente
     alignItems: 'center',       // Centra el contenido horizontalmente
-    paddingTop: 15,
   },
   title: {
     color: Colors.primary,
     fontSize: 23,
     fontWeight: 'bold',
+  },
+  safeArea: {
+    backgroundColor: '#FFFFFF',
   },
 });
 
