@@ -28,9 +28,10 @@ export default function TabLayout() {
         header: () => <Header />, // Aquí defines el header personalizado globalmente
       }}>
       <Tabs.Screen
-        name="home"
+        name="index"
         options={{
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          tabBarShowLabel: false, // Hide the tab labels
         }}
       />
       <Tabs.Screen

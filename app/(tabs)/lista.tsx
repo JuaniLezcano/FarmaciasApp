@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, FlatList, Text, View } from 'react-native';
+import { StyleSheet, FlatList, Text, TouchableOpacity, View } from 'react-native';
 import { Text as ThemedText, View as ThemedView } from '@/components/Themed';
 
 const pharmacies = [
@@ -10,8 +10,12 @@ const pharmacies = [
   { id: '5', name: 'Farmacia Moderna', distance: '2.8 km' },
 ];
 
-
 export default function TabTwoScreen() {
+  const handlePress = (pharmacy) => {
+    console.log(`Pressed: ${pharmacy.name}`);
+    // Aquí puedes agregar navegación o cualquier otra lógica al presionar
+  };
+
   return (
     <ThemedView style={styles.container}>
       <FlatList
@@ -19,10 +23,13 @@ export default function TabTwoScreen() {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.itemContainer}>
-            <View style={styles.item}>
+            <TouchableOpacity
+              style={styles.item}
+              onPress={() => handlePress(item)} // Detecta el toque y ejecuta una función
+            >
               <Text style={styles.name}>{item.name}</Text>
               <Text style={styles.distance}>{item.distance}</Text>
-            </View>
+            </TouchableOpacity>
           </View>
         )}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
