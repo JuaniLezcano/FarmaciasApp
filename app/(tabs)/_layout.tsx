@@ -26,18 +26,18 @@ export default function TabLayout() {
         // Disable the static render of the header on web
         // to prevent a hydration error in React Navigation v6.
         header: () => <Header />, // Aquí defines el header personalizado globalmente
+        tabBarShowLabel: false, // Hide the tab labels
       }}>
       <Tabs.Screen
         name="index"
         options={{
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          tabBarShowLabel: false, // Hide the tab labels
+          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
         }}
       />
       <Tabs.Screen
         name="lista"
         options={{
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name="list" color={color} />,
         }}
       />
     </Tabs>

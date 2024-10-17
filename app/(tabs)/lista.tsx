@@ -1,34 +1,36 @@
 import React from 'react';
 import { StyleSheet, FlatList, Text, TouchableOpacity, View } from 'react-native';
 import { Text as ThemedText, View as ThemedView } from '@/components/Themed';
+import { Pharmacy } from "@/constants/types";
+import { useRouter } from 'expo-router';
 
-const pharmacies = [
-  { id: '1', name: 'Farmacia Central', distance: '2 km' },
-  { id: '2', name: 'Farmacia del Pueblo', distance: '3.5 km' },
-  { id: '3', name: 'Farmacia San Juan', distance: '1.2 km' },
-  { id: '4', name: 'Farmacia La Salud', distance: '4 km' },
-  { id: '5', name: 'Farmacia Moderna', distance: '2.8 km' },
+
+const pharmacies: Pharmacy[] = [
+  { id: 1, name: 'Farmacia Central', distance: 2000 },
+  { id: 2, name: 'Farmacia del Pueblo', distance: 3500 },
+  { id: 3, name: 'Farmacia San Juan', distance: 1200 },
+  { id: 4, name: 'Farmacia La Salud', distance: 4000 },
+  { id: 5, name: 'Farmacia Moderna', distance: 2800 },
 ];
 
-export default function TabTwoScreen() {
-  const handlePress = (pharmacy) => {
-    console.log(`Pressed: ${pharmacy.name}`);
-    // Aquí puedes agregar navegación o cualquier otra lógica al presionar
-  };
+export default function ListScreen() {
+
+  const router = useRouter();  // Inicializa el router
+
 
   return (
     <ThemedView style={styles.container}>
       <FlatList
         data={pharmacies}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View style={styles.itemContainer}>
             <TouchableOpacity
+              onPress={() => router.navigate('./')}
               style={styles.item}
-              onPress={() => handlePress(item)} // Detecta el toque y ejecuta una función
             >
               <Text style={styles.name}>{item.name}</Text>
-              <Text style={styles.distance}>{item.distance}</Text>
+              <Text style={styles.distance}>{item.distance} m</Text>
             </TouchableOpacity>
           </View>
         )}
