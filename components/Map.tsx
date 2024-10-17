@@ -25,8 +25,7 @@ export default function FarmMap() {
 
     // Estado para almacenar los restaurantes cercanos al usuario
     const [nearbyFarms, setNearbyFarms] = useState<FarmPoint[]>([]);
-    // Al momento de realizar una llamada a la API de Google Places te retorna una lista de restaurantes (en este caso) y si hay más de cierta cantidad
-    // Entonces lo que hace google es usar un token para mostrarlos en una página siguiente
+
     const [nextPageToken, setNextPageToken] = useState<string | null>(null);
 
     const additionalFarms: FarmPoint[] = [
@@ -96,7 +95,7 @@ export default function FarmMap() {
                 });
                 const userLatitude = currentLocation.coords.latitude;
                 const userLongitude = currentLocation.coords.longitude;
-
+                
                 // Establecer la ubicación del usuario
                 setLocation({
                     latitude: userLatitude,
@@ -104,7 +103,7 @@ export default function FarmMap() {
                     latitudeDelta: 0.0922, // Zoom inicial en el mapa
                     longitudeDelta: 0.0421,
                 });
-
+                //console.log("Location", location?.latitude, location?.longitude, location?.latitudeDelta, location?.longitudeDelta);
             } catch (error) {
                 console.error("Error obteniendo la ubicación:", error);
             } finally {
@@ -119,7 +118,9 @@ export default function FarmMap() {
                 {loading ? (
                     <ActivityIndicator size="large" color="#0000ff" />
                 ) : location ? (
-                    <MapView style={styles.map} region={location}>
+                    <MapView style={styles.map} region={location} onRegionChangeComplete={() => {
+                        console.log("Location mapa:", location.latitude, location.longitude, location.latitudeDelta, location.longitudeDelta);
+                    }} showsUserLocation={true}>
                         {[...nearbyFarms, ...additionalFarms].map(
                             (farm) => (
                                 <Marker
