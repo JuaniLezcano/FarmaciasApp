@@ -4,7 +4,6 @@ import { Text as ThemedText, View as ThemedView } from '@/components/Themed';
 import { Pharmacy } from "@/constants/types";
 import { useRouter } from 'expo-router';
 
-
 const pharmacies: Pharmacy[] = [
   { id: 1, name: 'Farmacia Central', distance: 2000 },
   { id: 2, name: 'Farmacia del Pueblo', distance: 3500 },
@@ -14,9 +13,7 @@ const pharmacies: Pharmacy[] = [
 ];
 
 export default function ListScreen() {
-
-  const router = useRouter();  // Inicializa el router
-
+  const router = useRouter(); // Inicializa el router
 
   return (
     <ThemedView style={styles.container}>
@@ -36,6 +33,7 @@ export default function ListScreen() {
         )}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
         contentContainerStyle={styles.listContainer}
+        numColumns={2} // Muestra los elementos en dos columnas
       />
     </ThemedView>
   );
@@ -50,14 +48,15 @@ const styles = StyleSheet.create({
     paddingVertical: 20, // Espacio en la parte superior e inferior de la lista
   },
   itemContainer: {
-    width: '100%', // El contenedor de cada ítem debe ocupar el ancho completo
-    alignItems: 'center', // Centra los ítems dentro del contenedor
+    flex: 1, // Cada elemento toma el 50% del ancho disponible
+    padding: 10,
+    alignItems: 'center',
   },
   item: {
     padding: 15,
     backgroundColor: '#f9f9f9',
     borderRadius: 10,
-    width: '90%', // Asegura que todas las tarjetas tengan el mismo ancho
+    width: '100%', // Cada tarjeta ocupa el ancho completo de su contenedor
     alignItems: 'center', // Centra el contenido dentro de las tarjetas
   },
   name: {
@@ -70,9 +69,9 @@ const styles = StyleSheet.create({
   },
   separator: {
     height: 1,
-    width: '90%', // El separador también debe tener el mismo ancho que las tarjetas
+    width: '90%',
     backgroundColor: '#eee',
-    alignSelf: 'center', // Asegura que el separador esté centrado
-    marginVertical: 10, // Espacio entre los ítems
+    alignSelf: 'center',
+    marginVertical: 10,
   },
 });
