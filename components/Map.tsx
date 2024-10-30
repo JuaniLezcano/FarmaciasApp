@@ -1,5 +1,5 @@
 import * as Location from 'expo-location';
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import MapView, { Marker } from 'react-native-maps';
 import { StyleSheet, View, ScrollView, ActivityIndicator, Text } from 'react-native';
 
@@ -19,72 +19,47 @@ type FarmPoint = {
 
 export default function FarmMap() {
     const [location, setLocation] = useState<LocationType>(null);
-
-    // Estado para gestionar el estado de carga
     const [loading, setLoading] = useState(true);
-
-    // Estado para almacenar los restaurantes cercanos al usuario
     const [nearbyFarms, setNearbyFarms] = useState<FarmPoint[]>([]);
+    const [error, setError] = useState<string | null>(null);
 
-    const [nextPageToken, setNextPageToken] = useState<string | null>(null);
-
-    const additionalFarms: FarmPoint[] = [
-        {
-            id: 1,
-            name: "Farmacia1",
-            latitude: -34.9138048884854,
-            longitude: -57.94808435414168,
-        },
-        {
-            id: 2,
-            name: "Farmacia2",
-            latitude: -34.91801012714514,
-            longitude: -57.95458602885797,
-        },
-        {
-            id: 3,
-            name: "Farmacia3",
-            latitude: -34.91575797594942,
-            longitude: -57.95510101289757,
-        },
-        {
-            id: 4,
-            name: "Farmacia4",
-            latitude: -34.91081037947414,
-            longitude: -57.94575454132004,
-        },
-        {
-            id: 5,
-            name: "Farmacia5",
-            latitude: -34.90639681023369,
-            longitude: -57.924194197557235,
-        },
-    ];
-
-    const haversine = (
-        lat1: number,
-        lon1: number,
-        lat2: number,
-        lon2: number
-    ): number => {
-        const R = 6371; // Radio de la Tierra en kilómetros
-        const dLat = (lat2 - lat1) * (Math.PI / 180); // Diferencia de latitud en radianes
-        const dLon = (lon2 - lon1) * (Math.PI / 180); // Diferencia de longitud en radianes
-        const a =
-            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(lat1 * (Math.PI / 180)) *
-            Math.cos(lat2 * (Math.PI / 180)) *
-            Math.sin(dLon / 2) *
-            Math.sin(dLon / 2); // Fórmula de Haversine
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); // Arco entre los puntos
-        return R * c; // Distancia en kilómetros
+    const fetchNearbyFarms = async (lat: number, lon: number) => {
+        try {
+            const response = await fetch(`http://192.168.1.97:3000/farmacias-cercanas?lat=${lat}&lon=${lon}`);
+            if (!response.ok) {
+                throw new Error('Error en la solicitud al servidor');
+            }
+    
+            const data = await response.json();
+    
+            // Calcular distancia y filtrar las cinco farmacias más cercanas
+            const farms = data
+            .map((farm: any) => ({
+                id: farm.id,
+                name: farm.nombre,  // Mapear 'nombre' a 'name'
+                latitude: farm.latitude,
+                longitude: farm.longitude,
+                distance: Math.sqrt(
+                    Math.pow(farm.latitude - lat, 2) + Math.pow(farm.longitude - lon, 2)
+                ),
+            }))
+            .sort((a: FarmPoint & { distance: number }, b: FarmPoint & { distance: number }) => a.distance - b.distance)
+            .slice(0, 5);
+        
+    
+            setNearbyFarms(farms);
+            console.log(farms)
+        } catch (error) {
+            console.error("Error fetching nearby farms:", error);
+            setError("No se pudo obtener las farmacias cercanas");
+        }
     };
 
     useEffect(() => {
         (async () => {
             let { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== "granted") {
-                console.log("Permission to access location was denied");
+                setError("Permission to access location was denied");
                 setLoading(false);
                 return;
             }
@@ -95,45 +70,48 @@ export default function FarmMap() {
                 });
                 const userLatitude = currentLocation.coords.latitude;
                 const userLongitude = currentLocation.coords.longitude;
-                
+
                 // Establecer la ubicación del usuario
                 setLocation({
                     latitude: userLatitude,
                     longitude: userLongitude,
-                    latitudeDelta: 0.0922, // Zoom inicial en el mapa
+                    latitudeDelta: 0.0922,
                     longitudeDelta: 0.0421,
                 });
-                //console.log("Location", location?.latitude, location?.longitude, location?.latitudeDelta, location?.longitudeDelta);
+
+                // Llamar a la función para obtener farmacias cercanas
+                await fetchNearbyFarms(userLatitude, userLongitude);
             } catch (error) {
                 console.error("Error obteniendo la ubicación:", error);
+                setError("Error obteniendo la ubicación");
             } finally {
-                setLoading(false); // Una vez que se obtienen los datos, se deja de cargar
+                setLoading(false);
             }
         })();
-    }, []); // Ejecutar el efecto cuando se monta el componente
+    }, []);
 
     return (
         <ScrollView>
             <View style={styles.mapContainer}>
                 {loading ? (
                     <ActivityIndicator size="large" color="#0000ff" />
+                ) : error ? (
+                    <Text>{error}</Text>
                 ) : location ? (
-                    <MapView style={styles.map} region={location} onRegionChangeComplete={() => {
-                        console.log("Location mapa:", location.latitude, location.longitude, location.latitudeDelta, location.longitudeDelta);
-                    }} showsUserLocation={true}>
-                        {[...nearbyFarms, ...additionalFarms].map(
-                            (farm) => (
-                                <Marker
-                                    key={`Farmacia-${farm.id}`} // Ensure unique keys by prefixing the ID
-                                    coordinate={{
-                                        latitude: farm.latitude,
-                                        longitude: farm.longitude,
-                                    }}
-                                    title={farm.name}
-                                    description="Farmacia de turno"
-                                />
-                            )
-                        )}
+                    <MapView style={styles.map} region={location} showsUserLocation={true}>
+                        {nearbyFarms.map((farm) => {
+                                console.log(`Nombre de la farmacia: ${farm.name}`);
+                                return (
+                                    <Marker
+                                        key={`Farmacia-${farm.id}`}
+                                        coordinate={{
+                                            latitude: farm.latitude,
+                                            longitude: farm.longitude,
+                                        }}
+                                        title={farm.name}
+                                    />
+                                );
+                        })}
                     </MapView>
                 ) : (
                     <Text>No se pudo obtener la ubicación</Text>
@@ -152,4 +130,4 @@ const styles = StyleSheet.create({
         flex: 1,
         height: "100%",
     }
-})
+});
