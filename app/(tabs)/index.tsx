@@ -1,8 +1,8 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Button, View } from "react-native";
 import FarmMap from "../../components/Map";
-import { useEffect, useContext } from "react";
+import { useEffect, useContext, useState } from "react";
 import { Text } from "@/components/Themed";
-import { fetchNearbyFarms } from "../../hooks/useFarms";
+import { fetchFarms } from "../../hooks/useFarms";
 import * as Location from "expo-location";
 import { FarmsContext } from "../../context/farmContext";
 
@@ -14,11 +14,12 @@ export default function HomeScreen() {
   }
 
   const { farms, setFarms, loading, setLoading, error, setError } = context;
+  const [showAll, setShowAll] = useState(false); // Estado para alternar entre 5 y todas
 
   // Función para obtener las farmacias cercanas
   const getNearbyFarms = async () => {
     try {
-      console.log("solicitando permisos...");
+      console.log("Solicitando permisos...");
       const { status } = await Location.requestForegroundPermissionsAsync();
 
       if (status !== "granted") {
@@ -37,7 +38,12 @@ export default function HomeScreen() {
       const userLongitude = currentLocation.coords.longitude;
 
       console.log("Obteniendo farmacias cercanas...");
-      const fetchedFarms = await fetchNearbyFarms(userLatitude, userLongitude);
+      const fetchedFarms = await fetchFarms(
+        userLatitude,
+        userLongitude,
+        showAll ? undefined : 5 // Mostrar todas o solo 5
+      );
+
       setFarms(fetchedFarms);
     } catch (error) {
       console.log("Error en getNearbyFarms:", error);
@@ -47,10 +53,10 @@ export default function HomeScreen() {
     }
   };
 
-  // Llama a la función cuando el componente se monta
+  // Llama a la función cuando el componente se monta o cuando showAll cambia
   useEffect(() => {
     getNearbyFarms();
-  }, []);
+  }, [showAll]);
 
   // Renderiza el mapa o muestra un mensaje de carga/error
   if (loading) {
@@ -61,5 +67,19 @@ export default function HomeScreen() {
     return <Text>{error}</Text>;
   }
 
-  return <FarmMap farms={farms} />;
+  return (
+    <View style={styles.container}>
+      <FarmMap farms={farms} />
+      <Button
+        title={showAll ? "Mostrar menos" : "Mostrar todas"}
+        onPress={() => setShowAll(!showAll)} // Alterna el valor de showAll
+      />
+    </View>
+  );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
