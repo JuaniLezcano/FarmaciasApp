@@ -1,29 +1,38 @@
-import React from 'react';
-import { StyleSheet, FlatList, Text, TouchableOpacity, View } from 'react-native';
-import { Text as ThemedText, View as ThemedView } from '@/components/Themed';
-import { Pharmacy } from "@/constants/types";
-import { useRouter } from 'expo-router';
-
-const pharmacies: Pharmacy[] = [
-  { id: 1, name: 'Farmacia Central', distance: 2000 },
-  { id: 2, name: 'Farmacia del Pueblo', distance: 3500 },
-  { id: 3, name: 'Farmacia San Juan', distance: 1200 },
-  { id: 4, name: 'Farmacia La Salud', distance: 4000 },
-  { id: 5, name: 'Farmacia Moderna', distance: 2800 },
-];
+import React, { useContext } from "react";
+import {
+  StyleSheet,
+  FlatList,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { Text as ThemedText, View as ThemedView } from "@/components/Themed";
+import { useRouter } from "expo-router";
+import { FarmsContext } from "../../context/farmContext";
 
 export default function ListScreen() {
-  const router = useRouter(); // Inicializa el router
+  const router = useRouter();
+  const farmsContext = useContext(FarmsContext);
+
+  if (!farmsContext) {
+    return (
+      <ThemedText>
+        Error: El contexto de farmacias no está disponible
+      </ThemedText>
+    );
+  }
+
+  const { farms } = farmsContext;
 
   return (
     <ThemedView style={styles.container}>
       <FlatList
-        data={pharmacies}
+        data={farms}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View style={styles.itemContainer}>
             <TouchableOpacity
-              onPress={() => router.navigate('./')}
+              onPress={() => router.navigate("./")}
               style={styles.item}
             >
               <Text style={styles.name}>{item.name}</Text>
@@ -42,36 +51,46 @@ export default function ListScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
+    backgroundColor: "#f0f0f0", // Fondo claro para la vista principal
   },
   listContainer: {
-    paddingVertical: 20, // Espacio en la parte superior e inferior de la lista
+    paddingVertical: 20,
   },
   itemContainer: {
-    flex: 1, // Cada elemento toma el 50% del ancho disponible
+    flex: 1,
     padding: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
   item: {
     padding: 15,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: "#fff", // Fondo blanco para las tarjetas
     borderRadius: 10,
-    width: '100%', // Cada tarjeta ocupa el ancho completo de su contenedor
-    alignItems: 'center', // Centra el contenido dentro de las tarjetas
+    width: "100%",
+    alignItems: "center",
+    shadowColor: "#000", // Sombra
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 3.5,
+    elevation: 5, // Efecto de elevación para Android
   },
   name: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 16, // Tamaño de fuente ajustado
+    fontWeight: "bold",
+    color: "#333", // Color de texto más oscuro
   },
   distance: {
-    fontSize: 16,
-    color: 'gray',
+    fontSize: 14, // Tamaño de fuente ajustado
+    color: "gray",
   },
   separator: {
     height: 1,
-    width: '90%',
-    backgroundColor: '#eee',
-    alignSelf: 'center',
+    width: "90%",
+    backgroundColor: "#eee",
+    alignSelf: "center",
     marginVertical: 10,
   },
 });
