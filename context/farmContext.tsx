@@ -1,7 +1,7 @@
 // farmContext.tsx
 import React, { createContext, useState, useEffect, ReactNode } from "react";
 import * as Location from "expo-location";
-import { fetchNearbyFarms } from "../hooks/useFarms";
+import { fetchFarms } from "../hooks/useFarms";
 
 interface Farm {
   id: string;
@@ -53,7 +53,7 @@ export function FarmsProvider({ children }: FarmsProviderProps) {
       const { latitude, longitude } = location.coords;
       setUserLocation({ latitude, longitude });
 
-      const fetchedFarms = await fetchNearbyFarms(latitude, longitude);
+      const fetchedFarms = await fetchFarms(latitude, longitude);
       const farmsWithDistance = fetchedFarms.map((farm: Farm) => ({
         ...farm,
         distance: calculateDistance(
