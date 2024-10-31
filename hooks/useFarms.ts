@@ -1,8 +1,8 @@
 export const fetchFarms = async (lat: number, lon: number, cant?: number) => {
   // Construir la URL de la API con el parámetro cantidad solo si está presente
   const apiUrl = cant
-    ? `http://192.168.0.38:3000/farmacias-cercanas/abiertas?lat=${lat}&lon=${lon}&cantidad=${cant}`
-    : `http://192.168.0.38:3000/farmacias-cercanas/abiertas?lat=${lat}&lon=${lon}`;
+    ? `http://192.168.94.153:3000/farmacias-cercanas/abiertas?lat=${lat}&lon=${lon}&cantidad=${cant}`
+    : `http://192.168.94.153:3000/farmacias-cercanas/abiertas?lat=${lat}&lon=${lon}`;
 
   try {
     const response = await fetch(apiUrl);

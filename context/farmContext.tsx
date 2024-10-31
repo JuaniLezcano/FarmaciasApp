@@ -1,4 +1,3 @@
-// farmContext.tsx
 import React, { createContext, useState, useEffect, ReactNode } from "react";
 import * as Location from "expo-location";
 import { fetchFarms } from "../hooks/useFarms";
@@ -18,12 +17,14 @@ interface UserLocation {
 
 interface FarmsContextType {
   farms: Farm[];
-  setFarms: React.Dispatch<React.SetStateAction<Farm[]>>; // Agrega esto
+  setFarms: React.Dispatch<React.SetStateAction<Farm[]>>;
+  displayedFarms: Farm[];
+  setDisplayedFarms: React.Dispatch<React.SetStateAction<Farm[]>>;
   userLocation: UserLocation | null;
   loading: boolean;
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>; // Agrega esto
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   error: string | null;
-  setError: React.Dispatch<React.SetStateAction<string | null>>; // Agrega esto
+  setError: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 interface FarmsProviderProps {
@@ -34,9 +35,11 @@ export const FarmsContext = createContext<FarmsContextType | null>(null);
 
 export function FarmsProvider({ children }: FarmsProviderProps) {
   const [farms, setFarms] = useState<Farm[]>([]);
+  const [displayedFarms, setDisplayedFarms] = useState<Farm[]>([]); // Estado para farmacias mostradas
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [visibleFarms, setVisibleFarms] = useState([]); // Farmacias visibles en el mapa
 
   const getNearbyFarms = async () => {
     try {
@@ -64,6 +67,7 @@ export function FarmsProvider({ children }: FarmsProviderProps) {
         ),
       }));
       setFarms(farmsWithDistance);
+      setDisplayedFarms(farmsWithDistance.slice(0, 5)); // Inicialmente muestra las primeras 5
     } catch (error) {
       setError("No se pudo obtener las farmacias cercanas");
     } finally {
@@ -100,6 +104,8 @@ export function FarmsProvider({ children }: FarmsProviderProps) {
       value={{
         farms,
         setFarms,
+        displayedFarms,
+        setDisplayedFarms,
         userLocation,
         loading,
         setLoading,

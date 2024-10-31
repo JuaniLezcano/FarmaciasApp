@@ -22,12 +22,12 @@ export default function ListScreen() {
     );
   }
 
-  const { farms } = farmsContext;
+  const { displayedFarms } = farmsContext; // Cambiar farms a displayedFarms
 
   return (
     <ThemedView style={styles.container}>
       <FlatList
-        data={farms}
+        data={displayedFarms} // Cambiar aquí
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View style={styles.itemContainer}>
@@ -42,7 +42,7 @@ export default function ListScreen() {
         )}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
         contentContainerStyle={styles.listContainer}
-        numColumns={2} // Muestra los elementos en dos columnas
+        numColumns={2}
       />
     </ThemedView>
   );
