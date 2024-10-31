@@ -1,6 +1,9 @@
-export const fetchNearbyFarms = async (lat: number, lon: number) => {
-    const apiUrl = `http://192.168.0.38:3000/farmacias-cercanas?lat=${lat}&lon=${lon}&cantidad=${5}`;
-    
+export const fetchFarms = async (lat: number, lon: number, cant?: number) => {
+    // Construir la URL de la API con el parámetro cantidad solo si está presente
+    const apiUrl = cant
+        ? `http://192.168.0.38:3000/farmacias-cercanas?lat=${lat}&lon=${lon}&cantidad=${cant}`
+        : `http://192.168.0.38:3000/farmacias-cercanas?lat=${lat}&lon=${lon}`;
+
     try {
         const response = await fetch(apiUrl);
         if (!response.ok) {
