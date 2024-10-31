@@ -11,49 +11,20 @@ type LocationType = {
 } | null;
 
 type FarmPoint = {
-    id: number;
+    id: string;
     name: string;
     latitude: number;
     longitude: number;
 };
 
-export default function FarmMap() {
+interface FarmMapProps {
+    farms: FarmPoint[];  // Recibir farms como prop
+}
+
+export default function FarmMap({ farms }: FarmMapProps) {
     const [location, setLocation] = useState<LocationType>(null);
     const [loading, setLoading] = useState(true);
-    const [nearbyFarms, setNearbyFarms] = useState<FarmPoint[]>([]);
     const [error, setError] = useState<string | null>(null);
-
-    const fetchNearbyFarms = async (lat: number, lon: number) => {
-        try {
-            const response = await fetch(`http://192.168.1.97:3000/farmacias-cercanas?lat=${lat}&lon=${lon}`);
-            if (!response.ok) {
-                throw new Error('Error en la solicitud al servidor');
-            }
-    
-            const data = await response.json();
-    
-            // Calcular distancia y filtrar las cinco farmacias más cercanas
-            const farms = data
-            .map((farm: any) => ({
-                id: farm.id,
-                name: farm.nombre,  // Mapear 'nombre' a 'name'
-                latitude: farm.latitude,
-                longitude: farm.longitude,
-                distance: Math.sqrt(
-                    Math.pow(farm.latitude - lat, 2) + Math.pow(farm.longitude - lon, 2)
-                ),
-            }))
-            .sort((a: FarmPoint & { distance: number }, b: FarmPoint & { distance: number }) => a.distance - b.distance)
-            .slice(0, 5);
-        
-    
-            setNearbyFarms(farms);
-            console.log(farms)
-        } catch (error) {
-            console.error("Error fetching nearby farms:", error);
-            setError("No se pudo obtener las farmacias cercanas");
-        }
-    };
 
     useEffect(() => {
         (async () => {
@@ -78,9 +49,6 @@ export default function FarmMap() {
                     latitudeDelta: 0.0922,
                     longitudeDelta: 0.0421,
                 });
-
-                // Llamar a la función para obtener farmacias cercanas
-                await fetchNearbyFarms(userLatitude, userLongitude);
             } catch (error) {
                 console.error("Error obteniendo la ubicación:", error);
                 setError("Error obteniendo la ubicación");
@@ -99,18 +67,18 @@ export default function FarmMap() {
                     <Text>{error}</Text>
                 ) : location ? (
                     <MapView style={styles.map} region={location} showsUserLocation={true}>
-                        {nearbyFarms.map((farm) => {
-                                console.log(`Nombre de la farmacia: ${farm.name}`);
-                                return (
-                                    <Marker
-                                        key={`Farmacia-${farm.id}`}
-                                        coordinate={{
-                                            latitude: farm.latitude,
-                                            longitude: farm.longitude,
-                                        }}
-                                        title={farm.name}
-                                    />
-                                );
+                        {farms.map((farm) => {
+                            console.log(`Nombre de la farmacia: ${farm.name}`);
+                            return (
+                                <Marker
+                                    key={`Farmacia-${farm.id}`}
+                                    coordinate={{
+                                        latitude: farm.latitude,
+                                        longitude: farm.longitude,
+                                    }}
+                                    title={farm.name}
+                                />
+                            );
                         })}
                     </MapView>
                 ) : (
