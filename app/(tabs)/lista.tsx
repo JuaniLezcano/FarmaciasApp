@@ -22,12 +22,12 @@ export default function ListScreen() {
     );
   }
 
-  const { displayedFarms } = farmsContext; // Cambiar farms a displayedFarms
+  const { visibleFarms } = farmsContext;
 
   return (
     <ThemedView style={styles.container}>
       <FlatList
-        data={displayedFarms} // Cambiar aquí
+        data={visibleFarms}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View style={styles.itemContainer}>
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    backgroundColor: "#f0f0f0", // Fondo claro para la vista principal
+    backgroundColor: "#f0f0f0",
   },
   listContainer: {
     paddingVertical: 20,
@@ -64,26 +64,26 @@ const styles = StyleSheet.create({
   },
   item: {
     padding: 15,
-    backgroundColor: "#fff", // Fondo blanco para las tarjetas
+    backgroundColor: "#fff",
     borderRadius: 10,
     width: "100%",
     alignItems: "center",
-    shadowColor: "#000", // Sombra
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
     },
     shadowOpacity: 0.2,
     shadowRadius: 3.5,
-    elevation: 5, // Efecto de elevación para Android
+    elevation: 5,
   },
   name: {
-    fontSize: 16, // Tamaño de fuente ajustado
+    fontSize: 16,
     fontWeight: "bold",
-    color: "#333", // Color de texto más oscuro
+    color: "#333",
   },
   distance: {
-    fontSize: 14, // Tamaño de fuente ajustado
+    fontSize: 14,
     color: "gray",
   },
   separator: {

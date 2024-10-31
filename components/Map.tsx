@@ -79,7 +79,6 @@ export default function FarmMap({ farms }: FarmMapProps) {
             showsUserLocation={true}
           >
             {farms.map((farm) => {
-              console.log(`Nombre de la farmacia: ${farm.name}`);
               return (
                 <Marker
                   key={`Farmacia-${farm.id}`}

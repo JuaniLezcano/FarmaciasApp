@@ -20,6 +20,8 @@ interface FarmsContextType {
   setFarms: React.Dispatch<React.SetStateAction<Farm[]>>;
   displayedFarms: Farm[];
   setDisplayedFarms: React.Dispatch<React.SetStateAction<Farm[]>>;
+  visibleFarms: Farm[]; // Añade visibleFarms al contexto
+  setVisibleFarms: React.Dispatch<React.SetStateAction<Farm[]>>;
   userLocation: UserLocation | null;
   loading: boolean;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
@@ -35,11 +37,11 @@ export const FarmsContext = createContext<FarmsContextType | null>(null);
 
 export function FarmsProvider({ children }: FarmsProviderProps) {
   const [farms, setFarms] = useState<Farm[]>([]);
-  const [displayedFarms, setDisplayedFarms] = useState<Farm[]>([]); // Estado para farmacias mostradas
+  const [displayedFarms, setDisplayedFarms] = useState<Farm[]>([]);
+  const [visibleFarms, setVisibleFarms] = useState<Farm[]>([]); // Inicializa visibleFarms
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [visibleFarms, setVisibleFarms] = useState([]); // Farmacias visibles en el mapa
 
   const getNearbyFarms = async () => {
     try {
@@ -67,7 +69,8 @@ export function FarmsProvider({ children }: FarmsProviderProps) {
         ),
       }));
       setFarms(farmsWithDistance);
-      setDisplayedFarms(farmsWithDistance.slice(0, 5)); // Inicialmente muestra las primeras 5
+      setDisplayedFarms(farmsWithDistance.slice(0, 5)); // Muestra las primeras 5
+      setVisibleFarms(farmsWithDistance.slice(0, 5)); // Actualiza visibleFarms
     } catch (error) {
       setError("No se pudo obtener las farmacias cercanas");
     } finally {
@@ -106,6 +109,8 @@ export function FarmsProvider({ children }: FarmsProviderProps) {
         setFarms,
         displayedFarms,
         setDisplayedFarms,
+        visibleFarms,
+        setVisibleFarms,
         userLocation,
         loading,
         setLoading,
