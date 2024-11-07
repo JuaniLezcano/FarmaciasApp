@@ -3,7 +3,7 @@ import {
   StyleSheet,
   FlatList,
   Text,
-  TouchableOpacity,
+  Pressable,
   View,
 } from "react-native";
 import { Text as ThemedText, View as ThemedView } from "@/components/Themed";
@@ -31,13 +31,18 @@ export default function ListScreen() {
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View style={styles.itemContainer}>
-            <TouchableOpacity
+            <Pressable
               onPress={() => router.navigate("./")}
-              style={styles.item}
+              style={({ pressed }) => [
+                styles.item,
+                { opacity: pressed ? 0.8 : 1 },
+              ]}
             >
-              <Text style={styles.name}>{item.name}</Text>
+              <Text style={styles.name} numberOfLines={2} ellipsizeMode="tail">
+                {item.name}
+              </Text>
               <Text style={styles.distance}>{item.distance} m</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         )}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
@@ -52,10 +57,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#f7f7f7",
   },
   listContainer: {
     paddingVertical: 20,
+    paddingHorizontal: 10,
   },
   itemContainer: {
     flex: 1,
@@ -63,34 +69,35 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   item: {
-    padding: 15,
+    padding: 20,
     backgroundColor: "#fff",
-    borderRadius: 10,
-    width: "100%",
+    borderRadius: 15,
+    width: 180, // Tamaño fijo
+    height: 100, // Tamaño fijo
     alignItems: "center",
+    justifyContent: "center",
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
-    shadowRadius: 3.5,
-    elevation: 5,
+    shadowRadius: 5,
+    elevation: 6,
   },
   name: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: "600",
     color: "#333",
+    marginBottom: 5,
+    textAlign: "center",
   },
   distance: {
     fontSize: 14,
-    color: "gray",
+    color: "#777",
   },
   separator: {
     height: 1,
     width: "90%",
-    backgroundColor: "#eee",
+    backgroundColor: "#ddd",
     alignSelf: "center",
-    marginVertical: 10,
+    marginVertical: 15,
   },
 });
