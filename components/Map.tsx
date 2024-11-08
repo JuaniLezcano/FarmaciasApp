@@ -75,7 +75,7 @@ export default function FarmMap({ farms }: FarmMapProps) {
     console.log("Fetching route...");
     setSelectedFarm(farm); // Actualiza la farmacia seleccionada
     try {
-      const response = await fetch(`http://10.10.22.90:3000/get-directions`, {
+      const response = await fetch(`http://10.10.17.238:3000/get-directions`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -153,8 +153,7 @@ export default function FarmMap({ farms }: FarmMapProps) {
 
 const styles = StyleSheet.create({
   mapContainer: {
-    height: 400,
-    marginVertical: 16,
+    height: 600,
   },
   map: {
     flex: 1,
