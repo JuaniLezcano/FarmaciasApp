@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Text,
 } from "react-native";
+import useFetchRoute from "../hooks/useRoutes"; 
 
 type LocationType = {
   latitude: number;
@@ -16,26 +17,15 @@ type LocationType = {
   longitudeDelta: number;
 } | null;
 
-type FarmPoint = {
-  id: string;
-  name: string;
-  latitude: number;
-  longitude: number;
-  distance?: number;
-};
-
 interface FarmMapProps {
-  farms: FarmPoint[];
+  farms: Array<{ id: string; name: string; latitude: number; longitude: number }>;
 }
 
 export default function FarmMap({ farms }: FarmMapProps) {
   const [location, setLocation] = useState<LocationType>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [routeCoordinates, setRouteCoordinates] = useState<
-    { latitude: number; longitude: number }[]
-  >([]);
-  const [selectedFarm, setSelectedFarm] = useState<FarmPoint | null>(null);
+  const { routeCoordinates, selectedFarm, fetchRoute, clearRoute } = useFetchRoute();
 
   useEffect(() => {
     (async () => {
@@ -68,47 +58,6 @@ export default function FarmMap({ farms }: FarmMapProps) {
     })();
   }, []);
 
-  // Función para obtener la ruta al hacer clic en una farmacia
-  const fetchRoute = async (farm: FarmPoint) => {
-    if (!location) return;
-
-    console.log("Fetching route...");
-    setSelectedFarm(farm); // Actualiza la farmacia seleccionada
-    try {
-      const response = await fetch(`http://10.10.17.238:3000/get-directions`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          origin: {
-            latitude: location.latitude,
-            longitude: location.longitude,
-          },
-          destination: { latitude: farm.latitude, longitude: farm.longitude },
-        }),
-      });
-
-      const data = await response.json();
-      const coordinates = data.route.map(
-        (point: { lat: number; lng: number }) => ({
-          latitude: point.lat,
-          longitude: point.lng,
-        })
-      );
-
-      setRouteCoordinates(coordinates);
-    } catch (error) {
-      console.error("Error fetching route:", error);
-    }
-  };
-
-  // Función para deseleccionar la farmacia y ocultar la ruta
-  const clearRoute = () => {
-    setSelectedFarm(null);
-    setRouteCoordinates([]);
-  };
-
   return (
     <ScrollView>
       <View style={styles.mapContainer}>
@@ -121,7 +70,7 @@ export default function FarmMap({ farms }: FarmMapProps) {
             style={styles.map}
             region={location}
             showsUserLocation={true}
-            onPress={clearRoute} // Llama a clearRoute al hacer clic fuera de una farmacia
+            onPress={clearRoute}
           >
             {farms.map((farm) => (
               <Marker
@@ -131,7 +80,10 @@ export default function FarmMap({ farms }: FarmMapProps) {
                   longitude: farm.longitude,
                 }}
                 title={farm.name}
-                onPress={() => fetchRoute(farm)} // Llama a fetchRoute al hacer clic en la farmacia
+                onPress={() => fetchRoute(
+                  { latitude: location.latitude, longitude: location.longitude },
+                  farm
+                )}
               />
             ))}
 

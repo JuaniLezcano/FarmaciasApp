@@ -70,8 +70,8 @@ export function FarmsProvider({ children }: FarmsProviderProps) {
         ),
       }));
       setFarms(farmsWithDistance);
-      setDisplayedFarms(farmsWithDistance.slice(0, 6)); // Muestra las primeras 5
-      setVisibleFarms(farmsWithDistance.slice(0, 6)); // Actualiza visibleFarms
+      setDisplayedFarms(farmsWithDistance.slice(0, 5)); // Muestra las primeras 5
+      setVisibleFarms(farmsWithDistance.slice(0, 5)); // Actualiza visibleFarms
     } catch (error) {
       setError("No se pudo obtener las farmacias cercanas");
     } finally {

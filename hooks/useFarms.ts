@@ -1,8 +1,10 @@
+import useIp from "./useIp";
 export const fetchFarms = async (lat: number, lon: number, cant?: number) => {
+  const { ip } = useIp();
   // Construir la URL de la API con el parámetro cantidad solo si está presente
   const apiUrl = cant
-    ? `http://10.10.17.238:3000/farmacias-abiertas-o-de-turno?lat=${lat}&lon=${lon}&cantidad=${cant}`
-    : `http://10.10.17.238:3000/farmacias-abiertas-o-de-turno?lat=${lat}&lon=${lon}`;
+    ? `http://${ip}:3000/farmacias-abiertas-o-de-turno?lat=${lat}&lon=${lon}&cantidad=${cant}`
+    : `http://${ip}:3000/farmacias-abiertas-o-de-turno?lat=${lat}&lon=${lon}`;
 
   try {
     const response = await fetch(apiUrl);
