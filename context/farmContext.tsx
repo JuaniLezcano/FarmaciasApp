@@ -1,3 +1,4 @@
+// FarmsProvider.js
 import React, { createContext, useState, useEffect, ReactNode } from "react";
 import * as Location from "expo-location";
 import { fetchFarms } from "../hooks/useFarms";
@@ -21,7 +22,7 @@ interface FarmsContextType {
   setFarms: React.Dispatch<React.SetStateAction<Farm[]>>;
   displayedFarms: Farm[];
   setDisplayedFarms: React.Dispatch<React.SetStateAction<Farm[]>>;
-  visibleFarms: Farm[]; // Añade visibleFarms al contexto
+  visibleFarms: Farm[];
   setVisibleFarms: React.Dispatch<React.SetStateAction<Farm[]>>;
   userLocation: UserLocation | null;
   loading: boolean;
@@ -39,7 +40,7 @@ export const FarmsContext = createContext<FarmsContextType | null>(null);
 export function FarmsProvider({ children }: FarmsProviderProps) {
   const [farms, setFarms] = useState<Farm[]>([]);
   const [displayedFarms, setDisplayedFarms] = useState<Farm[]>([]);
-  const [visibleFarms, setVisibleFarms] = useState<Farm[]>([]); // Inicializa visibleFarms
+  const [visibleFarms, setVisibleFarms] = useState<Farm[]>([]);
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -70,8 +71,8 @@ export function FarmsProvider({ children }: FarmsProviderProps) {
         ),
       }));
       setFarms(farmsWithDistance);
-      setDisplayedFarms(farmsWithDistance.slice(0, 5)); // Muestra las primeras 5
-      setVisibleFarms(farmsWithDistance.slice(0, 5)); // Actualiza visibleFarms
+      setDisplayedFarms(farmsWithDistance.slice(0, 5));
+      setVisibleFarms(farmsWithDistance.slice(0, 5));
     } catch (error) {
       setError("No se pudo obtener las farmacias cercanas");
     } finally {
@@ -85,7 +86,7 @@ export function FarmsProvider({ children }: FarmsProviderProps) {
     lat2: number,
     lon2: number
   ): number => {
-    const R = 6371e3; // Radio de la Tierra en metros
+    const R = 6371e3;
     const φ1 = (lat1 * Math.PI) / 180;
     const φ2 = (lat2 * Math.PI) / 180;
     const Δφ = ((lat2 - lat1) * Math.PI) / 180;
@@ -96,7 +97,7 @@ export function FarmsProvider({ children }: FarmsProviderProps) {
       Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-    return Math.round(R * c); // Devuelve la distancia en metros redondeada
+    return Math.round(R * c);
   };
 
   useEffect(() => {

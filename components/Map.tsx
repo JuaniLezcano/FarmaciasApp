@@ -1,78 +1,37 @@
-import * as Location from "expo-location";
-import { useState, useEffect } from "react";
+// FarmMap.js
+import { useContext } from "react";
 import MapView, { Marker, Polyline } from "react-native-maps";
-import {
-  StyleSheet,
-  View,
-  ScrollView,
-  ActivityIndicator,
-  Text,
-} from "react-native";
-import useFetchRoute from "../hooks/useRoutes"; 
+import { StyleSheet, View, ScrollView, ActivityIndicator, Text } from "react-native";
+import useFetchRoute from "../hooks/useRoutes";
+import { FarmsContext } from "../context/farmContext";
 
-type LocationType = {
-  latitude: number;
-  longitude: number;
-  latitudeDelta: number;
-  longitudeDelta: number;
-} | null;
-
-interface FarmMapProps {
-  farms: Array<{ id: string; name: string; latitude: number; longitude: number }>;
-}
-
-export default function FarmMap({ farms }: FarmMapProps) {
-  const [location, setLocation] = useState<LocationType>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export default function FarmMap() {
+  const farmsContext = useContext(FarmsContext);
+  const { farms, userLocation, loading, error } = farmsContext || {};
   const { routeCoordinates, selectedFarm, fetchRoute, clearRoute } = useFetchRoute();
 
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setError("Permission to access location was denied");
-        setLoading(false);
-        return;
-      }
-
-      try {
-        let currentLocation = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.Highest,
-        });
-        const userLatitude = currentLocation.coords.latitude;
-        const userLongitude = currentLocation.coords.longitude;
-
-        setLocation({
-          latitude: userLatitude,
-          longitude: userLongitude,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421,
-        });
-      } catch (error) {
-        console.error("Error obteniendo la ubicación:", error);
-        setError("Error obteniendo la ubicación");
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+  if (loading) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
 
   return (
     <ScrollView>
       <View style={styles.mapContainer}>
-        {loading ? (
-          <ActivityIndicator size="large" color="#0000ff" />
-        ) : error ? (
+        {error ? (
           <Text>{error}</Text>
-        ) : location ? (
+        ) : userLocation ? (
           <MapView
             style={styles.map}
-            region={location}
+            region={{
+              latitude: userLocation.latitude,
+              longitude: userLocation.longitude,
+              latitudeDelta: 0.0922,
+              longitudeDelta: 0.0421,
+            }}
             showsUserLocation={true}
             onPress={clearRoute}
           >
-            {farms.map((farm) => (
+            {farms && farms.map((farm) => (
               <Marker
                 key={`Farmacia-${farm.id}`}
                 coordinate={{
@@ -81,7 +40,7 @@ export default function FarmMap({ farms }: FarmMapProps) {
                 }}
                 title={farm.name}
                 onPress={() => fetchRoute(
-                  { latitude: location.latitude, longitude: location.longitude },
+                  { latitude: userLocation.latitude, longitude: userLocation.longitude },
                   farm
                 )}
               />
