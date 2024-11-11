@@ -29,6 +29,8 @@ interface FarmsContextType {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   error: string | null;
   setError: React.Dispatch<React.SetStateAction<string | null>>;
+  selectedFarm: any | null;
+  setSelectedFarm: (farm: any | null) => void;
 }
 
 interface FarmsProviderProps {
@@ -44,6 +46,12 @@ export function FarmsProvider({ children }: FarmsProviderProps) {
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedFarm, setSelectedFarm] = useState<{
+    id: string;
+    name: string;
+    latitude: number;
+    longitude: number;
+  } | null>(null);
 
   const getNearbyFarms = async () => {
     try {
@@ -122,6 +130,8 @@ export function FarmsProvider({ children }: FarmsProviderProps) {
         setLoading,
         error,
         setError,
+        selectedFarm,
+        setSelectedFarm,
       }}
     >
       {children}

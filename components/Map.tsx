@@ -1,5 +1,5 @@
 import * as Location from "expo-location";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import MapView, { Marker } from "react-native-maps";
 import {
   StyleSheet,
@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import MapViewDirections from "react-native-maps-directions";
 import useFetchRoute from "../hooks/useRoutes";
+import { FarmsContext } from "../context/farmContext";
 
 type LocationType = {
   latitude: number;
@@ -40,12 +41,15 @@ export default function FarmMap({ farms }: FarmMapProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { routeCoordinates, fetchRoute, clearRoute } = useFetchRoute(); // Removed setRouteCoordinates
-  const [selectedFarm, setSelectedFarm] = useState<{
-    id: string;
-    name: string;
-    latitude: number;
-    longitude: number;
-  } | null>(null);
+
+  // Obtén el contexto en FarmMap
+  const farmContext = useContext(FarmsContext);
+
+  if (!farmContext) {
+    throw new Error("FarmsContext must be used within a FarmsProvider");
+  }
+
+  const { selectedFarm, setSelectedFarm } = farmContext;
 
   useEffect(() => {
     (async () => {
@@ -131,7 +135,6 @@ export default function FarmMap({ farms }: FarmMapProps) {
                 strokeColor="red"
                 strokeWidth={4}
                 onReady={(result) => {
-                  // Directly use result.coordinates if no state update is needed here
                   const newRouteCoordinates = result.coordinates.map(
                     (coord) => ({
                       instruction: "No instruction", // Replace with proper instruction logic

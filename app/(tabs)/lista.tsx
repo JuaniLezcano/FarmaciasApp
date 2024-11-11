@@ -1,11 +1,5 @@
 import React, { useContext } from "react";
-import {
-  StyleSheet,
-  FlatList,
-  Text,
-  Pressable,
-  View,
-} from "react-native";
+import { StyleSheet, FlatList, Text, Pressable, View } from "react-native";
 import { Text as ThemedText, View as ThemedView } from "@/components/Themed";
 import { useRouter } from "expo-router";
 import { FarmsContext } from "../../context/farmContext";
@@ -32,7 +26,10 @@ export default function ListScreen() {
         renderItem={({ item }) => (
           <View style={styles.itemContainer}>
             <Pressable
-              onPress={() => router.navigate("./")}
+              onPress={() => {
+                farmsContext.setSelectedFarm(item); // Guarda la farmacia seleccionada en el contexto
+                router.navigate("./"); // Navega a HomeScreen
+              }}
               style={({ pressed }) => [
                 styles.item,
                 { opacity: pressed ? 0.8 : 1 },
