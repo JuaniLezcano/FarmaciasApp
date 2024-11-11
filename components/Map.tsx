@@ -1,37 +1,102 @@
-// FarmMap.js
-import { useContext } from "react";
-import MapView, { Marker, Polyline } from "react-native-maps";
-import { StyleSheet, View, ScrollView, ActivityIndicator, Text } from "react-native";
+import * as Location from "expo-location";
+import { useState, useEffect } from "react";
+import MapView, { Marker } from "react-native-maps";
+import {
+  StyleSheet,
+  View,
+  ActivityIndicator,
+  Text,
+  ScrollView,
+} from "react-native";
+import MapViewDirections from "react-native-maps-directions";
 import useFetchRoute from "../hooks/useRoutes";
-import { FarmsContext } from "../context/farmContext";
 
-export default function FarmMap() {
-  const farmsContext = useContext(FarmsContext);
-  const { farms, userLocation, loading, error } = farmsContext || {};
-  const { routeCoordinates, selectedFarm, fetchRoute, clearRoute } = useFetchRoute();
+type LocationType = {
+  latitude: number;
+  longitude: number;
+  latitudeDelta: number;
+  longitudeDelta: number;
+} | null;
 
-  if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
-  }
+type RouteStep = {
+  instruction: string;
+  latitude: number;
+  longitude: number;
+};
+
+interface FarmMapProps {
+  farms: Array<{
+    id: string;
+    name: string;
+    latitude: number;
+    longitude: number;
+  }>;
+}
+
+const GOOGLE_MAPS_API_KEY = "AIzaSyAhF_BSG-vy6lkSGWHKFxBPBQpol2SNlwA";
+
+export default function FarmMap({ farms }: FarmMapProps) {
+  const [location, setLocation] = useState<LocationType>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { routeCoordinates, fetchRoute, clearRoute } = useFetchRoute(); // Removed setRouteCoordinates
+  const [selectedFarm, setSelectedFarm] = useState<{
+    id: string;
+    name: string;
+    latitude: number;
+    longitude: number;
+  } | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setError("Permission to access location was denied");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        let currentLocation = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Highest,
+        });
+        const userLatitude = currentLocation.coords.latitude;
+        const userLongitude = currentLocation.coords.longitude;
+
+        setLocation({
+          latitude: userLatitude,
+          longitude: userLongitude,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        });
+      } catch (error) {
+        console.error("Error obteniendo la ubicación:", error);
+        setError("Error obteniendo la ubicación");
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
 
   return (
-    <ScrollView>
-      <View style={styles.mapContainer}>
-        {error ? (
-          <Text>{error}</Text>
-        ) : userLocation ? (
+    <View style={styles.container}>
+      {loading ? (
+        <ActivityIndicator size="large" color="#0000ff" />
+      ) : error ? (
+        <Text>{error}</Text>
+      ) : location ? (
+        <>
           <MapView
             style={styles.map}
-            region={{
-              latitude: userLocation.latitude,
-              longitude: userLocation.longitude,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421,
-            }}
+            region={location}
             showsUserLocation={true}
-            onPress={clearRoute}
+            toolbarEnabled={false}
+            onPress={() => {
+              setSelectedFarm(null);
+              clearRoute();
+            }}
           >
-            {farms && farms.map((farm) => (
+            {farms.map((farm) => (
               <Marker
                 key={`Farmacia-${farm.id}`}
                 coordinate={{
@@ -39,35 +104,100 @@ export default function FarmMap() {
                   longitude: farm.longitude,
                 }}
                 title={farm.name}
-                onPress={() => fetchRoute(
-                  { latitude: userLocation.latitude, longitude: userLocation.longitude },
-                  farm
-                )}
+                onPress={() => {
+                  setSelectedFarm(farm);
+                  fetchRoute(
+                    {
+                      latitude: location.latitude,
+                      longitude: location.longitude,
+                    },
+                    farm
+                  );
+                }}
               />
             ))}
 
-            {routeCoordinates.length > 0 && (
-              <Polyline
-                coordinates={routeCoordinates}
-                strokeColor="#0000FF"
+            {selectedFarm && (
+              <MapViewDirections
+                origin={{
+                  latitude: location.latitude,
+                  longitude: location.longitude,
+                }}
+                destination={{
+                  latitude: selectedFarm.latitude,
+                  longitude: selectedFarm.longitude,
+                }}
+                apikey={GOOGLE_MAPS_API_KEY}
+                strokeColor="red"
                 strokeWidth={4}
+                onReady={(result) => {
+                  // Directly use result.coordinates if no state update is needed here
+                  const newRouteCoordinates = result.coordinates.map(
+                    (coord) => ({
+                      instruction: "No instruction", // Replace with proper instruction logic
+                      latitude: coord.latitude,
+                      longitude: coord.longitude,
+                    })
+                  );
+
+                  // Optionally, you can pass this data into another part of your app
+                }}
+                onError={(errorMessage) => {
+                  console.error("Error al calcular la ruta:", errorMessage);
+                }}
               />
             )}
           </MapView>
-        ) : (
-          <Text>No se pudo obtener la ubicación</Text>
-        )}
-      </View>
-    </ScrollView>
+
+          {/* Contenedor de instrucciones desplazable */}
+          {routeCoordinates.length > 0 && (
+            <View style={styles.instructionsContainer}>
+              <Text style={styles.instructionsTitle}>Indicaciones:</Text>
+              <ScrollView style={styles.scrollInstructions}>
+                {routeCoordinates.map((step, index) => (
+                  <Text key={index} style={styles.instructionText}>
+                    {index + 1}. {step.instruction}{" "}
+                    {/* Mostrar las instrucciones de cada paso */}
+                  </Text>
+                ))}
+              </ScrollView>
+            </View>
+          )}
+        </>
+      ) : (
+        <Text>No se pudo obtener la ubicación</Text>
+      )}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  mapContainer: {
-    height: 600,
+  container: {
+    flex: 1,
   },
   map: {
     flex: 1,
-    height: "100%",
+  },
+  instructionsContainer: {
+    position: "absolute",
+    bottom: 20,
+    left: 10,
+    right: 10,
+    backgroundColor: "#ffffffcc", // Fondo blanco semitransparente
+    padding: 10,
+    borderRadius: 8,
+    maxHeight: 200, // Altura máxima del contenedor
+  },
+  scrollInstructions: {
+    maxHeight: 150, // Limitar altura de la sección desplazable
+  },
+  instructionsTitle: {
+    fontWeight: "bold",
+    fontSize: 16,
+    marginBottom: 5,
+  },
+  instructionText: {
+    fontSize: 14,
+    marginBottom: 3,
   },
 });

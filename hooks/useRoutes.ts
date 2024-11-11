@@ -7,6 +7,12 @@ type Coordinate = {
   longitude: number;
 };
 
+type RouteStep = {
+  latitude: number;
+  longitude: number;
+  instruction: string; // Add instruction to each step
+};
+
 type FarmPoint = {
   id: string;
   name: string;
@@ -17,7 +23,7 @@ type FarmPoint = {
 
 export default function useFetchRoute() {
   const { ip } = useIp();
-  const [routeCoordinates, setRouteCoordinates] = useState<Coordinate[]>([]);
+  const [routeCoordinates, setRouteCoordinates] = useState<RouteStep[]>([]); // Include setRouteCoordinates in state
   const [selectedFarm, setSelectedFarm] = useState<FarmPoint | null>(null);
 
   const fetchRoute = async (origin: Coordinate, farm: FarmPoint) => {
@@ -37,10 +43,13 @@ export default function useFetchRoute() {
       });
 
       const data = await response.json();
-      const coordinates = data.route.map((point: { lat: number; lng: number }) => ({
-        latitude: point.lat,
-        longitude: point.lng,
-      }));
+      const coordinates = data.route.map(
+        (point: { lat: number; lng: number; instruction: string }) => ({
+          latitude: point.lat,
+          longitude: point.lng,
+          instruction: point.instruction, // Ensure instructions are included
+        })
+      );
 
       setRouteCoordinates(coordinates);
     } catch (error) {
