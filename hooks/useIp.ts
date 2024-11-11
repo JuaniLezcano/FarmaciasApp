@@ -1,4 +1,4 @@
 export default function useIp() {
-    const ip = "10.10.18.91"; 
+    const ip = "X.X.X.X"; 
     return { ip };
 }
