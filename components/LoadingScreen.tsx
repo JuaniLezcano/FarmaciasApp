@@ -1,15 +1,12 @@
-// LoadingScreen.tsx
 import React from 'react';
-import { View, Image, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 const LoadingScreen = () => {
   return (
     <View style={styles.container}>
-      <Image
-        source={require('../assets/images/pharmacy-logo.png')} // Asegúrate de tener un logo en esta ruta
-        style={styles.logo}
-      />
-      <ActivityIndicator size="large" color="#00ff00" />
+      <Ionicons name="medical" size={100} color="#4CAF50" />      
+      <ActivityIndicator size="large" color="#4CAF50" style={styles.loader} />
     </View>
   );
 };
@@ -19,13 +16,15 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#F0F4F8',
   },
-  logo: {
-    width: 100,
-    height: 100,
+  icon: {
     marginBottom: 20,
   },
+  loader: {
+    position: 'absolute',
+    bottom: 100,
+  }
 });
 
 export default LoadingScreen;

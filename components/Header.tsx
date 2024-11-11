@@ -32,12 +32,11 @@ const styles = StyleSheet.create({
   },
   header: {
     width: '100%',
-    height: 70,
+    height: 60,
     flexDirection: 'row',       // Alinea elementos en fila
     justifyContent: 'space-between', // Espacio entre los iconos y el título
     alignItems: 'center',       // Centra verticalmente el contenido
     paddingHorizontal: 16,      // Espacio a los lados
-    marginTop: 20,              // Margen superior
   },
   title: {
     color: Colors.primary,
