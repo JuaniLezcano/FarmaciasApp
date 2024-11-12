@@ -4,7 +4,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import * as DocumentPicker from 'expo-document-picker';
 import Colors from '../constants/Colors';
 import * as FileSystem from 'expo-file-system';
-
+import Papa from 'papaparse'; // Asegúrate de tener instalada la biblioteca papaparse
 
 const Header = () => {
   // Función para manejar la carga del archivo CSV
@@ -12,20 +12,34 @@ const Header = () => {
     try {
       // Abre el selector de archivos y limita a archivos CSV
       const result = await DocumentPicker.getDocumentAsync({
-        type: ['text/csv', 'application/vnd.ms-excel', 'text/comma-separated-values', 'text/plain'], // Diferentes tipos MIME para archivos CSV
+        type: ['text/csv', 'application/vnd.ms-excel', 'text/comma-separated-values', 'text/plain'],
       });
-
+  
       // Verifica que el usuario no haya cancelado la selección
       if (!result.canceled) {
-        const fileUri = result.assets[0].uri; // Obtiene la URI del archivo seleccionado
-
+        const fileUri = result.assets[0].uri;
+  
         // Lee el contenido del archivo CSV
         const fileContent = await FileSystem.readAsStringAsync(fileUri, { encoding: FileSystem.EncodingType.UTF8 });
-
-        // Imprime el contenido en consola
-        console.log("Contenido del archivo:", fileContent);
-
-        Alert.alert("Archivo seleccionado", `Nombre del archivo: ${result.assets[0].name}`);
+  
+        // Usa PapaParse para analizar el CSV
+        const parsedData = Papa.parse(fileContent, { header: true });
+  
+        // Verifica que parsedData.meta.fields esté definido antes de acceder a él
+        const headers = parsedData.meta?.fields || []; // Usa un arreglo vacío como valor por defecto
+  
+        // Comprueba que tenga las columnas requeridas
+        const requiredColumns = ['nombre', 'latitud', 'longitud'];
+        const hasRequiredColumns = requiredColumns.every(column => headers.includes(column));
+  
+        if (hasRequiredColumns) {
+          console.log("El archivo tiene las columnas requeridas.");
+          console.log("Contenido del archivo:", parsedData.data); // Muestra los datos en consola
+          Alert.alert("Archivo válido", `El archivo contiene las columnas necesarias.`);
+        } else {
+          console.warn("El archivo no tiene todas las columnas requeridas.");
+          Alert.alert("Archivo inválido", "El archivo no contiene las columnas necesarias (nombre, latitud, longitud).");
+        }
       } else {
         Alert.alert("Selección cancelada", "No se seleccionó ningún archivo.");
       }
@@ -34,7 +48,7 @@ const Header = () => {
       Alert.alert("Error", "No se pudo cargar el archivo CSV.");
     }
   };
-
+  
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar
