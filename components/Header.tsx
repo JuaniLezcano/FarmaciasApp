@@ -3,6 +3,8 @@ import { SafeAreaView, View, Text, StyleSheet, StatusBar, Pressable, Alert } fro
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import * as DocumentPicker from 'expo-document-picker';
 import Colors from '../constants/Colors';
+import * as FileSystem from 'expo-file-system';
+
 
 const Header = () => {
   // Función para manejar la carga del archivo CSV
@@ -14,11 +16,16 @@ const Header = () => {
       });
 
       // Verifica que el usuario no haya cancelado la selección
-      console.log(result);
+      if (!result.canceled) {
+        const fileUri = result.assets[0].uri; // Obtiene la URI del archivo seleccionado
 
-      if (result.canceled === false) {
+        // Lee el contenido del archivo CSV
+        const fileContent = await FileSystem.readAsStringAsync(fileUri, { encoding: FileSystem.EncodingType.UTF8 });
+
+        // Imprime el contenido en consola
+        console.log("Contenido del archivo:", fileContent);
+
         Alert.alert("Archivo seleccionado", `Nombre del archivo: ${result.assets[0].name}`);
-        // Aquí podrías procesar el archivo si es necesario
       } else {
         Alert.alert("Selección cancelada", "No se seleccionó ningún archivo.");
       }
@@ -37,10 +44,10 @@ const Header = () => {
       <View style={styles.header}>
         {/* Icono de cruz de farmacia a la izquierda */}
         <FontAwesome name="plus-square" size={24} color={Colors.primary} style={styles.iconLeft} />
-        
+
         {/* Título */}
         <Text style={styles.title}>Farmacias cercanas</Text>
-        
+
         {/* Icono de archivo a la derecha */}
         <Pressable onPress={handleFileUpload}>
           <FontAwesome name="file" size={24} color={Colors.primary} style={styles.iconRight} />
