@@ -5,23 +5,15 @@ import Colors from '../constants/Colors';
 import CSVUploader from './CSVUploader';
 
 const Header = () => {
-  // Función para manejar la carga del archivo CSV
-  
-  
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar
-        barStyle="dark-content" // Cambia a 'light-content' si prefieres texto claro en la barra de estado.
+        barStyle="dark-content"
         backgroundColor="#FFFFFF" // El color de fondo de la barra de estado.
       />
       <View style={styles.header}>
-        {/* Icono de cruz de farmacia a la izquierda */}
         <FontAwesome name="plus-square" size={24} color={Colors.primary} style={styles.iconLeft} />
-
-        {/* Título */}
         <Text style={styles.title}>Farmacias cercanas</Text>
-
-        {/* Icono de archivo a la derecha */}
         <CSVUploader/>
       </View>
     </SafeAreaView>
