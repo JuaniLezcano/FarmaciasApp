@@ -18,6 +18,7 @@ export const fetchFarms = async (lat: number, lon: number) => {
       name: farm.name,
       latitude: farm.latitude,
       longitude: farm.longitude,
+      distancia: farm.distancia,
     }));
   } catch (error) {
     console.error("Error fetching nearby farms:", error);

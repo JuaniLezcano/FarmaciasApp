@@ -44,11 +44,10 @@ const CSVUploader = () => {
                         name: row.nombre,
                         latitude: parseFloat(row.latitud),
                         longitude: parseFloat(row.longitud),
+                        distancia: 0,
                     }));
 
-                    setFarms(newFarms);
-                    setDisplayedFarms(newFarms.slice(0, 5));
-                    setVisibleFarms(newFarms.slice(0, 5));
+                    context.getNearbyFarms(newFarms);
 
                     Alert.alert("Archivo válido", "El archivo contiene las columnas necesarias.");
                 } else {

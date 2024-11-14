@@ -38,7 +38,7 @@ export default function ListScreen() {
               <Text style={styles.name} numberOfLines={2} ellipsizeMode="tail">
                 {item.name}
               </Text>
-              <Text style={styles.distance}>{item.distance} m</Text>
+              <Text style={styles.distance}>{item.distancia} m</Text>
             </Pressable>
           </View>
         )}
