@@ -181,7 +181,7 @@ export default function FarmMap({ farms }: FarmMapProps) {
             </View>
           )}
 
-          {selectedFarm && (
+          {selectedFarm && !showDirections &&(
             <View style={styles.cardContainer}>
               <FarmInfoCard
                 farmId={selectedFarm.id}
