@@ -11,6 +11,7 @@ import {
 import MapViewDirections from "react-native-maps-directions";
 import useFetchRoute from "../hooks/useRoutes";
 import { FarmsContext } from "../context/farmContext";
+import FarmInfoCard from "../components/FarmInfoCard"; // Importa la card
 
 type LocationType = {
   latitude: number;
@@ -31,6 +32,8 @@ interface FarmMapProps {
     name: string;
     latitude: number;
     longitude: number;
+    address?: string;
+    phone?: string;
   }>;
 }
 
@@ -40,9 +43,8 @@ export default function FarmMap({ farms }: FarmMapProps) {
   const [location, setLocation] = useState<LocationType>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { routeCoordinates, fetchRoute, clearRoute } = useFetchRoute(); // Removed setRouteCoordinates
+  const { routeCoordinates, fetchRoute, clearRoute } = useFetchRoute();
 
-  // Obtén el contexto en FarmMap
   const farmContext = useContext(FarmsContext);
 
   if (!farmContext) {
@@ -50,6 +52,7 @@ export default function FarmMap({ farms }: FarmMapProps) {
   }
 
   const { selectedFarm, setSelectedFarm } = farmContext;
+  const [showDirections, setShowDirections] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -121,7 +124,7 @@ export default function FarmMap({ farms }: FarmMapProps) {
               />
             ))}
 
-            {selectedFarm && (
+            {selectedFarm && showDirections && (
               <MapViewDirections
                 origin={{
                   latitude: location.latitude,
@@ -136,14 +139,20 @@ export default function FarmMap({ farms }: FarmMapProps) {
                 strokeWidth={4}
                 onReady={(result) => {
                   const newRouteCoordinates = result.coordinates.map(
-                    (coord) => ({
-                      instruction: "No instruction", // Replace with proper instruction logic
+                    (coord, index) => ({
+                      instruction: `Paso ${index + 1}`, // Puedes reemplazar con instrucciones reales si están disponibles
                       latitude: coord.latitude,
                       longitude: coord.longitude,
                     })
                   );
-
-                  // Optionally, you can pass this data into another part of your app
+                  // Actualiza las coordenadas de la ruta en el contexto
+                  fetchRoute(
+                    {
+                      latitude: location.latitude,
+                      longitude: location.longitude,
+                    },
+                    selectedFarm
+                  );
                 }}
                 onError={(errorMessage) => {
                   console.error("Error al calcular la ruta:", errorMessage);
@@ -151,19 +160,29 @@ export default function FarmMap({ farms }: FarmMapProps) {
               />
             )}
           </MapView>
-
-          {/* Contenedor de instrucciones desplazable */}
-          {routeCoordinates.length > 0 && (
+          {showDirections && routeCoordinates.length > 0 && (
             <View style={styles.instructionsContainer}>
               <Text style={styles.instructionsTitle}>Indicaciones:</Text>
               <ScrollView style={styles.scrollInstructions}>
                 {routeCoordinates.map((step, index) => (
                   <Text key={index} style={styles.instructionText}>
-                    {index + 1}. {step.instruction}{" "}
-                    {/* Mostrar las instrucciones de cada paso */}
+                    {index + 1}. {step.instruction}
                   </Text>
                 ))}
               </ScrollView>
+            </View>
+          )}
+
+          {selectedFarm && (
+            <View style={styles.cardContainer}>
+              <FarmInfoCard
+                farmId={selectedFarm.id}
+                name={selectedFarm.name}
+                latitude={selectedFarm.latitude}
+                longitude={selectedFarm.longitude}
+                address={selectedFarm.address || "Dirección no disponible"}
+                phone={selectedFarm.phone || "Teléfono no disponible"}
+              />
             </View>
           )}
         </>
@@ -202,5 +221,11 @@ const styles = StyleSheet.create({
   instructionText: {
     fontSize: 14,
     marginBottom: 3,
+  },
+  cardContainer: {
+    position: "absolute",
+    bottom: 10,
+    left: 10,
+    right: 10,
   },
 });

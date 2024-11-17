@@ -9,6 +9,8 @@ interface Farm {
   latitude: number;
   longitude: number;
   distance?: number;
+  address?: string;
+  phone?: string;
 }
 
 interface UserLocation {
@@ -30,6 +32,8 @@ interface FarmsContextType {
   setError: React.Dispatch<React.SetStateAction<string | null>>;
   selectedFarm: Farm | null;
   setSelectedFarm: (farm: Farm | null) => void;
+  showDirections: boolean;
+  setShowDirections: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 interface FarmsProviderProps {
@@ -46,6 +50,7 @@ export function FarmsProvider({ children }: FarmsProviderProps) {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedFarm, setSelectedFarm] = useState<Farm | null>(null);
+  const [showDirections, setShowDirections] = useState<boolean>(false);
 
   const getNearbyFarms = async () => {
     try {
@@ -126,6 +131,8 @@ export function FarmsProvider({ children }: FarmsProviderProps) {
         setError,
         selectedFarm,
         setSelectedFarm,
+        showDirections,
+        setShowDirections,
       }}
     >
       {children}
