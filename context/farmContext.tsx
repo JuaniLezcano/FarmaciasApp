@@ -68,11 +68,10 @@ export function FarmsProvider({ children }: FarmsProviderProps) {
       const { latitude, longitude } = location.coords;
       setUserLocation({ latitude, longitude });
 
-      let fetchedFarms
+      let fetchedFarms;
       if (farms) {
         fetchedFarms = farms;
-      }
-      else {
+      } else {
         fetchedFarms = await fetchFarms(latitude, longitude);
       }
 
@@ -89,7 +88,7 @@ export function FarmsProvider({ children }: FarmsProviderProps) {
       }));
       // Ordenar las farmacias por distancia
       farmsWithDistance.sort((a: Farm, b: Farm) => a.distancia - b.distancia);
-      
+
       setFarms(farmsWithDistance);
       setDisplayedFarms(farmsWithDistance.slice(0, 5));
       setVisibleFarms(farmsWithDistance.slice(0, 5));
@@ -144,7 +143,7 @@ export function FarmsProvider({ children }: FarmsProviderProps) {
         setError,
         selectedFarm,
         setSelectedFarm,
-        getNearbyFarms
+        getNearbyFarms,
         showDirections,
         setShowDirections,
       }}

@@ -71,6 +71,7 @@ const FarmInfoCard: React.FC<FarmInfoCardProps> = ({
                 name,
                 latitude,
                 longitude,
+                distancia: 0,
               });
               setShowDirections(true); // Activa la lógica de rutas
             }}
