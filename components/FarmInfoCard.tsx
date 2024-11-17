@@ -32,7 +32,7 @@ const FarmInfoCard: React.FC<FarmInfoCardProps> = ({
     return null; // Si el contexto no está disponible, retorna null o muestra algún error.
   }
 
-  const { setSelectedFarm, setShowDirections } = farmsContext;
+  const { showDirections, selectedFarm, setSelectedFarm, setShowDirections } = farmsContext;
 
   // Función para llamar a la farmacia
   const callFarm = () => {
@@ -45,8 +45,12 @@ const FarmInfoCard: React.FC<FarmInfoCardProps> = ({
 
   // Función para abrir la ubicación en un mapa
   const navigateToFarm = () => {
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
-    Linking.openURL(url);
+    console.log("Navigate to farm");
+    console.log(showDirections)
+    console.log(selectedFarm)
+    setShowDirections(true); // Activa la lógica de rutas
+    console.log(showDirections)
+    console.log(selectedFarm)
   };
 
   return (
@@ -73,7 +77,7 @@ const FarmInfoCard: React.FC<FarmInfoCardProps> = ({
                 longitude,
                 distancia: 0,
               });
-              setShowDirections(true); // Activa la lógica de rutas
+              navigateToFarm();
             }}
           >
             <Text style={styles.buttonText}>Ir</Text>

@@ -53,8 +53,7 @@ export default function FarmMap({ farms }: FarmMapProps) {
     throw new Error("FarmsContext must be used within a FarmsProvider");
   }
 
-  const { selectedFarm, setSelectedFarm } = farmContext;
-  const [showDirections, setShowDirections] = useState(false);
+  const { selectedFarm, setSelectedFarm, showDirections, setShowDirections } = farmContext;
 
   useEffect(() => {
     (async () => {
@@ -87,6 +86,10 @@ export default function FarmMap({ farms }: FarmMapProps) {
     })();
   }, []);
 
+  useEffect(() => {
+    console.log("showDirections ha cambiado a:", showDirections);
+  }, [showDirections]);
+
   return (
     <View style={styles.container}>
       {loading ? (
@@ -116,6 +119,7 @@ export default function FarmMap({ farms }: FarmMapProps) {
                 }}
                 tracksViewChanges={Platform.OS === 'ios' ? false : true}
                 onPress={() => {
+                  setShowDirections(false);
                   setSelectedFarm(farm);
                   fetchRoute(
                     {
