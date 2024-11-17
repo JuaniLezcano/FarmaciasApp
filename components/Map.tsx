@@ -1,5 +1,5 @@
 import * as Location from "expo-location";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useCallback } from "react";
 import MapView, { Marker } from "react-native-maps";
 import {
   StyleSheet,
@@ -13,6 +13,7 @@ import useFetchRoute from "../hooks/useRoutes";
 import { FarmsContext } from "../context/farmContext";
 import FarmInfoCard from "../components/FarmInfoCard"; // Importa la card
 import { Platform } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 
 type LocationType = {
   latitude: number;
@@ -90,6 +91,16 @@ export default function FarmMap({ farms }: FarmMapProps) {
     console.log("showDirections ha cambiado a:", showDirections);
   }, [showDirections]);
 
+  useFocusEffect(
+    useCallback(() => {
+      // Cuando la pantalla gana el foco, no hacemos nada
+      return () => {
+        // Cuando la pantalla pierde el foco, reseteamos showDirections
+        setShowDirections(false);
+      };
+    }, [])
+  );
+
   return (
     <View style={styles.container}>
       {loading ? (
@@ -105,6 +116,7 @@ export default function FarmMap({ farms }: FarmMapProps) {
             toolbarEnabled={false}
             onPress={(event) => {
               if (event.nativeEvent.action !== 'marker-press') {
+                setShowDirections(false);
                 setSelectedFarm(null);
                 clearRoute();
               }
@@ -119,7 +131,6 @@ export default function FarmMap({ farms }: FarmMapProps) {
                 }}
                 tracksViewChanges={Platform.OS === 'ios' ? false : true}
                 onPress={() => {
-                  setShowDirections(false);
                   setSelectedFarm(farm);
                   fetchRoute(
                     {
