@@ -12,6 +12,7 @@ import MapViewDirections from "react-native-maps-directions";
 import useFetchRoute from "../hooks/useRoutes";
 import { FarmsContext } from "../context/farmContext";
 import FarmInfoCard from "../components/FarmInfoCard"; // Importa la card
+import { Platform } from "react-native";
 
 type LocationType = {
   latitude: number;
@@ -99,9 +100,11 @@ export default function FarmMap({ farms }: FarmMapProps) {
             region={location}
             showsUserLocation={true}
             toolbarEnabled={false}
-            onPress={() => {
-              setSelectedFarm(null);
-              clearRoute();
+            onPress={(event) => {
+              if (event.nativeEvent.action !== 'marker-press') {
+                setSelectedFarm(null);
+                clearRoute();
+              }
             }}
           >
             {farms.map((farm) => (
@@ -111,7 +114,7 @@ export default function FarmMap({ farms }: FarmMapProps) {
                   latitude: farm.latitude,
                   longitude: farm.longitude,
                 }}
-                title={farm.name}
+                tracksViewChanges={Platform.OS === 'ios' ? false : true}
                 onPress={() => {
                   setSelectedFarm(farm);
                   fetchRoute(
