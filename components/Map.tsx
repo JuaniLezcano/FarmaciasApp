@@ -32,6 +32,7 @@ interface FarmMapProps {
     name: string;
     latitude: number;
     longitude: number;
+    distancia: number;
     address?: string;
     phone?: string;
   }>;

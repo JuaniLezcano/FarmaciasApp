@@ -8,7 +8,7 @@ interface Farm {
   name: string;
   latitude: number;
   longitude: number;
-  distance?: number;
+  distancia: number;
   address?: string;
   phone?: string;
 }
@@ -32,6 +32,7 @@ interface FarmsContextType {
   setError: React.Dispatch<React.SetStateAction<string | null>>;
   selectedFarm: Farm | null;
   setSelectedFarm: (farm: Farm | null) => void;
+  getNearbyFarms: (farms: Farm[] | undefined) => void;
   showDirections: boolean;
   setShowDirections: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -52,7 +53,7 @@ export function FarmsProvider({ children }: FarmsProviderProps) {
   const [selectedFarm, setSelectedFarm] = useState<Farm | null>(null);
   const [showDirections, setShowDirections] = useState<boolean>(false);
 
-  const getNearbyFarms = async () => {
+  const getNearbyFarms = async (farms?: Farm[]) => {
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
@@ -67,16 +68,28 @@ export function FarmsProvider({ children }: FarmsProviderProps) {
       const { latitude, longitude } = location.coords;
       setUserLocation({ latitude, longitude });
 
-      const fetchedFarms = await fetchFarms(latitude, longitude);
+      let fetchedFarms
+      if (farms) {
+        fetchedFarms = farms;
+      }
+      else {
+        fetchedFarms = await fetchFarms(latitude, longitude);
+      }
+
+      console.log(fetchedFarms);
+
       const farmsWithDistance = fetchedFarms.map((farm: Farm) => ({
         ...farm,
-        distance: calculateDistance(
+        distancia: calculateDistance(
           latitude,
           longitude,
           farm.latitude,
           farm.longitude
         ),
       }));
+      // Ordenar las farmacias por distancia
+      farmsWithDistance.sort((a: Farm, b: Farm) => a.distancia - b.distancia);
+      
       setFarms(farmsWithDistance);
       setDisplayedFarms(farmsWithDistance.slice(0, 5));
       setVisibleFarms(farmsWithDistance.slice(0, 5));
@@ -131,6 +144,7 @@ export function FarmsProvider({ children }: FarmsProviderProps) {
         setError,
         selectedFarm,
         setSelectedFarm,
+        getNearbyFarms
         showDirections,
         setShowDirections,
       }}
