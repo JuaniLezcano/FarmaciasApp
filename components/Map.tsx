@@ -87,10 +87,6 @@ export default function FarmMap({ farms }: FarmMapProps) {
     })();
   }, []);
 
-  useEffect(() => {
-    console.log("showDirections ha cambiado a:", showDirections);
-  }, [showDirections]);
-
   useFocusEffect(
     useCallback(() => {
       // Cuando la pantalla gana el foco, no hacemos nada
@@ -131,6 +127,7 @@ export default function FarmMap({ farms }: FarmMapProps) {
                 }}
                 tracksViewChanges={Platform.OS === 'ios' ? false : true}
                 onPress={() => {
+                  setShowDirections(false);
                   setSelectedFarm(farm);
                   fetchRoute(
                     {

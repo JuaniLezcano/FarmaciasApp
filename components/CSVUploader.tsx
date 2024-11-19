@@ -35,7 +35,7 @@ const CSVUploader = () => {
                 const parsedData = Papa.parse<CSVRow>(fileContent, { header: true });
                 const headers = parsedData.meta?.fields || [];
 
-                const requiredColumns = ['nombre', 'latitud', 'longitud', 'distancia', 'telefono'];
+                const requiredColumns = ['nombre', 'latitud', 'longitud', 'telefono'];
                 const hasRequiredColumns = requiredColumns.every(column => headers.includes(column));
 
                 if (hasRequiredColumns) {

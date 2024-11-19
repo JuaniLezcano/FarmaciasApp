@@ -75,8 +75,6 @@ export function FarmsProvider({ children }: FarmsProviderProps) {
         fetchedFarms = await fetchFarms(latitude, longitude);
       }
 
-      console.log(fetchedFarms);
-
       const farmsWithDistance = fetchedFarms.map((farm: Farm) => ({
         ...farm,
         distancia: calculateDistance(

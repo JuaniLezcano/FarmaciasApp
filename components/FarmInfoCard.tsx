@@ -45,12 +45,7 @@ const FarmInfoCard: React.FC<FarmInfoCardProps> = ({
 
   // Función para abrir la ubicación en un mapa
   const navigateToFarm = () => {
-    console.log("Navigate to farm");
-    console.log(showDirections)
-    console.log(selectedFarm)
-    setShowDirections(true); // Activa la lógica de rutas
-    console.log(showDirections)
-    console.log(selectedFarm)
+    setShowDirections(true);
   };
 
   return (
